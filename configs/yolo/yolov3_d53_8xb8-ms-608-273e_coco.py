@@ -21,7 +21,7 @@ model = dict(
         out_channels=[512, 256, 128]),
     bbox_head=dict(
         type='YOLOV3Head',
-        num_classes=80,
+        num_classes=20,
         in_channels=[512, 256, 128],
         out_channels=[1024, 512, 256],
         anchor_generator=dict(
@@ -52,13 +52,13 @@ model = dict(
     train_cfg=dict(
         assigner=dict(
             type='GridAssigner',
-            pos_iou_thr=0.5,
-            neg_iou_thr=0.5,
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
             min_pos_iou=0)),
     test_cfg=dict(
         nms_pre=1000,
         min_bbox_size=0,
-        score_thr=0.05,
+        score_thr=0.45,
         conf_thr=0.005,
         nms=dict(type='nms', iou_threshold=0.45),
         max_per_img=100))
@@ -109,7 +109,7 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
-    batch_size=8,
+    batch_size=4,
     num_workers=4,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -145,7 +145,7 @@ val_evaluator = dict(
     backend_args=backend_args)
 test_evaluator = val_evaluator
 
-train_cfg = dict(max_epochs=273, val_interval=7)
+train_cfg = dict(max_epochs=301, val_interval=7)
 
 # optimizer
 optim_wrapper = dict(
@@ -164,4 +164,6 @@ default_hooks = dict(checkpoint=dict(type='CheckpointHook', interval=7))
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (8 samples per GPU)
-auto_scale_lr = dict(base_batch_size=64)
+auto_scale_lr = dict(base_batch_size=32)
+
+evaluation = dict(interval=7, metric='mAP')
